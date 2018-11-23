@@ -1,27 +1,42 @@
 //防止命名冲突 => 匿名自调用函数
 ;(function () {
-	const todos =[
-		{
-			id:0,
-			title:'Html',
-			completed:false
-		},
-		{
-			id:1,
-			title:'CSS',
-			completed:false
-		},
-		{
-			id:2,
-			title:'Javascript',
-			completed:false
-		}
-	]
+	//const todos =[
+	//	{
+	//		id:0,
+	//		title:'Html',
+	//		completed:false
+	//	},
+	//	{
+	//		id:1,
+	//		title:'CSS',
+	//		completed:false
+	//	},
+	//	{
+	//		id:2,
+	//		title:'Javascript',
+	//		completed:false
+	//	}
+	//]
 	const app = new Vue({
 		data:{
-			todos,
+			todos : JSON.parse(window.localStorage.getItem('todos') || '[]'),
 			currentEditing: null,
 		},
+		watch:{
+			//方法名就是 成员变量的名字
+			//todos (){
+			//	console.log('浅层侦听todos');
+			//}
+			todos:{
+				handler(val, oldVal){
+					//当侦听到todos发生改变了(无论是何种变化),都会执行handler里的方法
+					//val 新值,oldVal老值
+					window.localStorage.setItem('todos',JSON.stringify(val))
+				},
+				deep:true
+			}
+		},
+
 		computed:{
 			//Vue提供了计算属性,是属性也是方法(本质),但是会把计算后的结果作为属性缓存起来
 			//多次调用会使用第一次调用后的结果,在使用时当做属性去写变量名
@@ -56,6 +71,7 @@
 				}
 			}
 		},
+
 		methods:{
 			handleAddNewTodo(e){
 				//方式1:使用表单双向数据绑定
@@ -83,13 +99,6 @@
 				//清空输入框
 				e.target.value = ''
 			},
-
-			//handleToggleAll(e){
-			//	const flag = e.target.checked;
-			//	this.todos.forEach(item => {
-			//		item.completed = flag;
-			//	})
-			//},
 
 			handleDelTodo(index){
 				this.todos.splice(index,1)
