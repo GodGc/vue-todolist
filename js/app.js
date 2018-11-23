@@ -22,6 +22,40 @@
 			todos,
 			currentEditing: null,
 		},
+		computed:{
+			//Vue提供了计算属性,是属性也是方法(本质),但是会把计算后的结果作为属性缓存起来
+			//多次调用会使用第一次调用后的结果,在使用时当做属性去写变量名
+			//简写模式
+			//remainingCount (){
+			//	return this.todos.filter(todo => !todo.completed).length
+			//}
+			//完整模式:
+			remainingCount: {
+				//获取值:当作为属性使用时会自动执行get方法
+				get(){
+					return this.todos.filter(todo => !todo.completed).length
+				},
+				//设置值:实例.remainingCount === xxx,会使用set方法(但是不会改变remainingCount的值)
+				set(){
+					console.log('remainingCount 的 set被调用了');
+				}
+			},
+			ToggleAllStatus: {
+				get(){
+					return this.todos.every(todo => todo.completed)
+				},
+				set(){
+					//当双向数据绑定时,每一次当前值的改变都会调用set方法
+					// 我们只需要对改变之前的checked状态取反,就可以得到现在的选中状态
+					// 比如之前是选中,改变=>未选中,所以只需要!选中就可以得到当前的状态
+					// 使用get即可获取之前的状态,当然计算属性默认执行的就是get方法,
+					const flag = !this.ToggleAllStatus;
+					this.todos.forEach(item => {
+						item.completed = flag;
+					})
+				}
+			}
+		},
 		methods:{
 			handleAddNewTodo(e){
 				//方式1:使用表单双向数据绑定
@@ -50,12 +84,12 @@
 				e.target.value = ''
 			},
 
-			handleToggleAll(e){
-				const flag = e.target.checked;
-				this.todos.forEach(item => {
-					item.completed = flag;
-				})
-			},
+			//handleToggleAll(e){
+			//	const flag = e.target.checked;
+			//	this.todos.forEach(item => {
+			//		item.completed = flag;
+			//	})
+			//},
 
 			handleDelTodo(index){
 				this.todos.splice(index,1)
